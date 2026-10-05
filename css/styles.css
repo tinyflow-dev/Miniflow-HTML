@@ -169,7 +169,10 @@ a:focus-visible {
    Without JS there are no letter spans, so the wordmark simply stays visible. */
 .mf-logo__letter {
   display: inline-block;
-  transform: translateY(100%);
+  
+  @media screen and (min-width: 768px) {
+    transform: translateY(100%);
+  }
 }
 
 .mf-logo:is(:hover, :focus-visible) .mf-logo__letter {

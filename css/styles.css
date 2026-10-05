@@ -1,0 +1,447 @@
+/* ==========================================================================
+   Miniflow — Coming soon
+   Tokens → base → layout → components. All styling is class based.
+   ========================================================================== */
+
+:root {
+  /* Brand colours */
+  --mf-accent: #D75B30;       /* primary orange: logo, top bar, large highlights */
+  --mf-accent-deep: #C24E26;  /* deeper orange for small text/buttons (4.8:1 on white) */
+  --mf-ink: #111318;
+  --mf-slate: #5A5F6B;
+  --mf-line: #E6E7EB;
+  --mf-mist: #F2F3F5;
+  --mf-white: #FFFFFF;
+
+  /* Type */
+  --mf-font-sans: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mf-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Motion text line box (each rolling letter is clipped to this height) */
+  --mf-roll-h: 1.2em;
+
+  /* Motion */
+  --mf-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --mf-ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --mf-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --mf-ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --mf-stagger: 25ms; /* between letters in the roll */
+}
+
+/* Base ------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--mf-white);
+  color: var(--mf-ink);
+  font-family: var(--mf-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+svg {
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--mf-accent-deep);
+  outline-offset: 4px;
+}
+
+/* Layout ----------------------------------------------------------------- */
+
+.mf-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(0deg, var(--mf-mist) 0%, #F8F8FA 45%, var(--mf-white) 100%);
+}
+
+.mf-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex: 0 0 10px;
+  width: 100%;
+  height: 10px;
+  background: var(--mf-accent);
+}
+
+.mf-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 72px;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: clamp(48px, 10vw, 120px) 24px 64px;
+}
+
+.mf-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+}
+
+.mf-columns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 48px 64px;
+}
+
+/* Logo ------------------------------------------------------------------- */
+
+.mf-logo {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 14px;
+  margin-bottom: -25px; /* pulls the title closer to the small mark */
+}
+
+.mf-logo__mark {
+  width: 39px;
+  height: 39px;
+  overflow: visible;
+  transform-origin: 50% 50%;
+}
+
+.mf-logo__tile {
+  fill: var(--mf-accent);
+}
+
+.mf-logo__dot,
+.mf-logo__pill {
+  fill: var(--mf-white);
+  transform-box: fill-box;
+}
+
+.mf-logo__dot {
+  transform-origin: center;
+}
+
+.mf-logo__pill {
+  transform-origin: left center;
+}
+
+/* Wordmark: hidden one line below its clipped box until the logo is hovered */
+.mf-logo__wordmark {
+  display: inline-flex;
+  align-items: flex-start;
+  height: var(--mf-roll-h);
+  overflow: hidden;
+  clip-path: inset(0);
+  font-size: 32px;
+  line-height: var(--mf-roll-h);
+  letter-spacing: -1.2px;
+}
+
+.mf-logo__mini {
+  font-weight: 500;
+  color: var(--mf-ink);
+}
+
+.mf-logo__flow {
+  font-weight: 700;
+  color: var(--mf-accent);
+}
+
+/* Letters rise in one after another on enter and drop out in reverse on leave
+   (--i is the letter index, --n the letter count, both set by js/split.js).
+   Without JS there are no letter spans, so the wordmark simply stays visible. */
+.mf-logo__letter {
+  display: inline-block;
+  transform: translateY(100%);
+}
+
+.mf-logo:is(:hover, :focus-visible) .mf-logo__letter {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mf-logo__mark {
+    transition: transform 500ms var(--mf-ease-out);
+  }
+
+  .mf-logo:is(:hover, :focus-visible) .mf-logo__mark {
+    transform: rotate(-8deg) scale(1.08) translateY(-2px);
+    transition-duration: 450ms;
+    transition-timing-function: var(--mf-ease-back);
+  }
+
+  /* Dots pop in one after another */
+  .mf-logo:is(:hover, :focus-visible) .mf-logo__dot {
+    animation: mf-logo-dot 350ms var(--mf-ease-back) both;
+  }
+
+  .mf-logo:is(:hover, :focus-visible) .mf-logo__dot + .mf-logo__dot {
+    animation-delay: 90ms;
+  }
+
+  /* Pill stretches out like a loader finishing */
+  .mf-logo:is(:hover, :focus-visible) .mf-logo__pill {
+    animation: mf-logo-pill 600ms 150ms ease-out both;
+  }
+
+  .mf-logo__letter {
+    transition: transform 350ms var(--mf-ease-in);
+    transition-delay: calc((var(--n) - 1 - var(--i)) * 35ms);
+  }
+
+  .mf-logo:is(:hover, :focus-visible) .mf-logo__letter {
+    transition-duration: 550ms;
+    transition-timing-function: var(--mf-ease-out);
+    transition-delay: calc(120ms + var(--i) * 35ms);
+  }
+}
+
+@keyframes mf-logo-dot {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+@keyframes mf-logo-pill {
+  0%   { transform: scale(0.3, 0.6); }
+  55%  { transform: scale(1.06, 1); }
+  80%  { transform: scale(0.98, 1); }
+  100% { transform: scale(1, 1); }
+}
+
+/* Title ------------------------------------------------------------------ */
+
+.mf-title {
+  margin: 0;
+  font-size: clamp(32px, 5.2vw, 58px);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+
+.mf-title__highlight {
+  font-weight: 700;
+  color: var(--mf-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.12em;
+}
+
+/* Button ----------------------------------------------------------------- */
+
+.mf-btn {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 10px;
+  margin-top: -12px;
+  padding: 16px 28px;
+  border-radius: 0;
+  background: var(--mf-accent-deep);
+  color: var(--mf-white);
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.mf-btn .mf-swap {
+  width: 18px;
+  height: 18px;
+}
+
+.mf-btn .mf-swap__icon {
+  stroke: var(--mf-white);
+}
+
+/* Letter roll (shared by the button and the project links) ---------------- */
+
+.mf-roll {
+  --mf-roll-copy: currentColor; /* colour of the letter that rolls in */
+  display: inline-flex;
+  align-items: flex-start;
+  height: var(--mf-roll-h);
+  overflow: hidden;
+  clip-path: inset(0);
+  line-height: var(--mf-roll-h);
+}
+
+/* Each letter draws its own copy one line below with text-shadow;
+   the box clips it until the letter moves up. */
+.mf-roll__char {
+  display: inline-block;
+  height: var(--mf-roll-h);
+  white-space: pre;
+  text-shadow: 0 var(--mf-roll-h) 0 var(--mf-roll-copy);
+}
+
+/* Icon swap (current icon leaves, next icon slides in) --------------------- */
+
+.mf-swap {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  overflow: hidden;
+  clip-path: inset(0);
+}
+
+.mf-swap__icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mf-swap__icon--next {
+  left: -100%;
+}
+
+.mf-swap--diagonal .mf-swap__icon--next {
+  top: 100%;
+}
+
+/* Roll + swap motion. Each letter and its copy move up 100%, forwards on
+   enter and backwards on leave; the visible icon leaves right (or up-right)
+   while the parked one slides in. */
+@media (prefers-reduced-motion: no-preference) {
+  .mf-roll__char {
+    transition: transform 450ms var(--mf-ease-out);
+    transition-delay: calc((var(--n) - 1 - var(--i)) * var(--mf-stagger));
+  }
+
+  :is(.mf-btn, .mf-link):is(:hover, :focus-visible) .mf-roll__char {
+    transform: translateY(-100%);
+    transition-delay: calc(var(--i) * var(--mf-stagger));
+  }
+
+  .mf-swap__icon {
+    transition: transform 500ms var(--mf-ease-in-out);
+  }
+
+  :is(.mf-btn, .mf-link):is(:hover, :focus-visible) .mf-swap__icon {
+    transform: translateX(100%);
+    transition-delay: 50ms;
+  }
+
+  :is(.mf-btn, .mf-link):is(:hover, :focus-visible) .mf-swap--diagonal .mf-swap__icon {
+    transform: translate(100%, -100%);
+  }
+}
+
+/* Sections & lists ------------------------------------------------------- */
+
+.mf-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.mf-section--projects {
+  flex: 999 1 480px;
+}
+
+.mf-section--stack {
+  flex: 1 1 260px;
+}
+
+.mf-section__label {
+  margin: 0;
+  color: var(--mf-slate);
+  font-family: var(--mf-font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+}
+
+.mf-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--mf-line);
+}
+
+.mf-list__item {
+  border-bottom: 1px solid var(--mf-line);
+}
+
+/* Project link */
+.mf-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  font-size: clamp(16px, 2.1vw, 22px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.mf-link__main {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.mf-link__icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.mf-link .mf-roll {
+  --mf-roll-copy: var(--mf-accent-deep);
+}
+
+.mf-link .mf-swap {
+  width: 22px;
+  height: 22px;
+}
+
+.mf-link .mf-swap__icon--current {
+  stroke: var(--mf-ink);
+}
+
+.mf-link .mf-swap__icon--next {
+  stroke: var(--mf-accent-deep);
+}
+
+/* Tech stack row */
+.mf-stack-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 0;
+  font-size: clamp(16px, 2.1vw, 22px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.mf-stack-item__icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}

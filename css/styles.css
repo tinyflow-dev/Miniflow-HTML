@@ -255,7 +255,7 @@ a:focus-visible {
   gap: 10px;
   margin-top: -12px;
   padding: 16px 28px;
-  border-radius: 0;
+  border-radius: 0.5rem;
   background: var(--mf-accent-deep);
   color: var(--mf-white);
   font-size: 17px;
